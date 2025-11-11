@@ -1,7 +1,9 @@
 
 import unittest 
+from enum import Enum
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode, text_node_to_html_node
+from textnode import TextNode, TextType 
 
 class TestHTMLNode(unittest.TestCase):
   def test_init(self):
@@ -88,6 +90,142 @@ class TestHTMLNode(unittest.TestCase):
   def test_leaf_to_html_link_tag(self):
       node = LeafNode("a", "Click here", props={"href": "https://example.com"})
       assert node.to_html() == '<a href="https://example.com">Click here</a>'
+
+  def test_to_html_with_children(self):
+      child_node = LeafNode("span", "child")
+      parent_node = ParentNode("div", [child_node])
+      self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+  def test_to_html_with_grandchildren(self):
+      grandchild_node = LeafNode("b", "grandchild")
+      child_node = ParentNode("span", [grandchild_node])
+      parent_node = ParentNode("div", [child_node])
+      self.assertEqual(
+          parent_node.to_html(),
+          "<div><span><b>grandchild</b></span></div>",
+      )
+
+  def test_parentnode_no_tag_raises(self):
+      node = ParentNode(tag=None, children=[])
+      try:
+          node.to_html()
+      except ValueError as e:
+          assert str(e) == "All parent nodes must have a tag."
+      else:
+          assert False, "ValueError not raised for missing tag"
+
+  def test_parentnode_no_children_raises(self):
+      node = ParentNode(tag="div", children=None)
+      try:
+          node.to_html()
+      except ValueError as e:
+          assert str(e) == "All parent nodes must have the children."
+      else:
+          assert False, "ValueError not raised for missing children"
+
+  def test_parentnode_img_tag_raises(self):
+      node = ParentNode(tag="img", children=[LeafNode("p", "text")])
+      try:
+          node.to_html()
+      except ValueError as e:
+          assert str(e) == "The parent nodes cannot have an img tag."
+      else:
+          assert False, "ValueError not raised for img tag"
+
+  def test_parentnode_empty_children_list_raises(self):
+      node = ParentNode(tag="div", children=[])
+      try:
+          node.to_html()
+      except ValueError as e:
+          assert str(e) == "All parent nodes must have the children."
+      else:
+          assert False, "ValueError not raised for empty children list"
+
+  def test_parentnode_single_child_to_html(self):
+      child = LeafNode("p", "Hello")
+      node = ParentNode(tag="div", children=[child])
+      expected_html = "<div><p>Hello</p></div>"
+      assert node.to_html() == expected_html
+
+  def test_parentnode_multiple_children_to_html(self):
+      children = [LeafNode("p", "Hello"), LeafNode("span", "World")]
+      node = ParentNode(tag="section", children=children)
+      expected_html = "<section><p>Hello</p><span>World</span></section>"
+      assert node.to_html() == expected_html
+
+  def test_parentnode_nested_parentnodes(self):
+      inner_child = LeafNode("em", "italic text")
+      inner_parent = ParentNode(tag="span", children=[inner_child])
+      outer_parent = ParentNode(tag="div", children=[inner_parent])
+      expected_html = "<div><span><em>italic text</em></span></div>"
+      assert outer_parent.to_html() == expected_html
+
+  def test_parentnode_with_props(self):
+      child = LeafNode("p", "Hello")
+      props = {"class": "container", "id": "main"}
+      node = ParentNode(tag="div", children=[child], props=props)
+      expected_html = '<div class="container" id="main"><p>Hello</p></div>'
+      assert node.to_html() == expected_html
+
+  def test_text(self):
+      node = TextNode("This is a text node", TextType.TEXT)
+      html_node = text_node_to_html_node(node)
+      self.assertEqual(html_node.tag, None)
+      self.assertEqual(html_node.value, "This is a text node")
+
+  def test_text_node_to_html_node_text(self):
+      node = TextNode("This is a text node", TextType.TEXT)
+      html_node = text_node_to_html_node(node)
+      assert html_node.tag is None
+      assert html_node.value == "This is a text node"
+      assert html_node.props is None
+
+  def test_text_node_to_html_node_bold(self):
+      node = TextNode("Bold text", TextType.BOLD)
+      html_node = text_node_to_html_node(node)
+      assert html_node.tag == "b"
+      assert html_node.value == "Bold text"
+      assert html_node.props is None
+
+  def test_text_node_to_html_node_italic(self):
+      node = TextNode("Italic text", TextType.ITALIC)
+      html_node = text_node_to_html_node(node)
+      assert html_node.tag == "i"
+      assert html_node.value == "Italic text"
+      assert html_node.props is None
+
+  def test_text_node_to_html_node_code(self):
+      node = TextNode("print('Hello')", TextType.CODE)
+      html_node = text_node_to_html_node(node)
+      assert html_node.tag == "code"
+      assert html_node.value == "print('Hello')"
+      assert html_node.props is None
+
+  def test_text_node_to_html_node_link(self):
+      node = TextNode("Click here", TextType.LINK)
+      html_node = text_node_to_html_node(node)
+      assert html_node.tag == "a"
+      assert html_node.value == "Click here"
+      assert html_node.props is None
+
+  def test_text_node_to_html_node_image(self):
+      node = TextNode("An image", TextType.IMAGE)
+      node.url = "http://example.com/image.png"
+      html_node = text_node_to_html_node(node)
+      assert html_node.tag == "img"
+      assert html_node.value == ""
+      assert html_node.props == {"src": "http://example.com/image.png", "alt": "An image"}
+
+  def test_text_node_to_html_node_unsupported_type(self):
+      class FakeTextType(Enum):
+          UNSUPPORTED = 99
+      node = TextNode("Unsupported", FakeTextType.UNSUPPORTED)
+      try:
+          text_node_to_html_node(node)
+      except ValueError as e:
+          assert str(e) == "The text node have a unsupported type."
+      else:
+          assert False, "ValueError not raised for unsupported text type"
 
 if __name__ == "__main__":
   unittest.main()

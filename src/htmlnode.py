@@ -1,4 +1,5 @@
 from enum import Enum
+from textnode import TextType
 
 class HTMLNodeType(Enum):
   pass
@@ -50,8 +51,41 @@ class LeafNode(HTMLNode):
 
     if self.tag == "img":
       return f'<{self.tag}{self.props_to_html()}/>'
-      
+
     return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
 
+
+class ParentNode(HTMLNode):
+  def __init__(self, tag, children, props=None):
+    super().__init__(tag, None, children, props)
+
+  def to_html(self):
+    if not self.tag: 
+      raise ValueError("All parent nodes must have a tag.")
+    
+    if not self.children: 
+      raise ValueError("All parent nodes must have the children.")
+
+    if self.tag == "img":
+      raise ValueError("The parent nodes cannot have an img tag.")
+      
+    return f'<{self.tag}{self.props_to_html()}>{"".join([child.to_html() for child in self.children])}</{self.tag}>'
+
+def text_node_to_html_node(text_node):
+    match text_node.text_type:
+      case TextType.TEXT:
+          return LeafNode(tag=None, value=text_node.text)
+      case TextType.BOLD:
+          return LeafNode(tag="b", value=text_node.text)
+      case TextType.ITALIC:
+          return LeafNode(tag="i", value=text_node.text)
+      case TextType.CODE:
+          return LeafNode(tag="code", value=text_node.text)
+      case TextType.LINK:
+          return LeafNode(tag="a", value=text_node.text)
+      case TextType.IMAGE:
+          return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text})
+      case _:
+          raise ValueError("The text node have a unsupported type.")
 
   
