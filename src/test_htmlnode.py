@@ -1,7 +1,7 @@
 
 import unittest 
 
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
 class TestHTMLNode(unittest.TestCase):
   def test_init(self):
@@ -55,6 +55,39 @@ class TestHTMLNode(unittest.TestCase):
       node = HTMLNode()
       expected = "HTMLNode(None, None, None, None)"
       assert repr(node) == expected
+
+  def test_leaf_to_html_p(self):
+      node = LeafNode("p", "Hello, world!")
+      assert node.to_html() == "<p>Hello, world!</p>"
+
+  def test_leaf_to_html_span_with_props(self):
+      node = LeafNode("span", "Text", props={"class": "highlight"})
+      assert node.to_html() == '<span class="highlight">Text</span>'
+
+  def test_leaf_to_html_code_tag(self):
+      node = LeafNode("code", "print('Hello')")
+      assert node.to_html() == "<code>print('Hello')</code>"
+
+  def test_leaf_to_html_without_tag(self):
+      node = LeafNode(None, "Just text")
+      assert node.to_html() == "Just text"
+
+  def test_leaf_to_html_empty_value_raises(self):
+      node = LeafNode("p", None)
+      try:
+          node.to_html()
+      except ValueError:
+          pass  # Test passes if ValueError is raised
+      else:
+          assert False, "ValueError was not raised when value is empty"
+      
+  def test_leaf_to_html_img_tag_self_closing(self):
+      node = LeafNode("img", "", props={"src": "image.png", "alt": "An image"})
+      assert node.to_html() == '<img src="image.png" alt="An image"/>'
+
+  def test_leaf_to_html_link_tag(self):
+      node = LeafNode("a", "Click here", props={"href": "https://example.com"})
+      assert node.to_html() == '<a href="https://example.com">Click here</a>'
 
 if __name__ == "__main__":
   unittest.main()
