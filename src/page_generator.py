@@ -2,11 +2,12 @@ import os
 import shutil
 import sys
 from htmlnode import markdown_to_html_node
+
 if len(sys.argv) > 1:
   basepath = sys.argv[1]
 else:
   basepath = "/"
-
+  
 def copy_directory_recursive(source_dir, dest_dir):
   # Step 1: If destination directory exists, delete all its contents
   if os.path.exists(dest_dir):
@@ -54,13 +55,12 @@ def generate_page(from_path, template_path, dest_path):
   html_content = html_node.to_html()
   title = extract_title(markdown_content)
   dest_dir = os.path.dirname(dest_path)
-  inner_folder = os.path.basename(dest_dir) 
   if not os.path.exists(dest_dir):
     os.makedirs(dest_dir)
   final_html = template_content.replace("{{ Title }}", title) \
                   .replace("{{ Content }}", html_content) \
-                  .replace('href="/', 'href="' + basepath) \
-                  .replace('src="/', 'src="' + basepath)
+                  .replace('href="/', 'href="' + f"{basepath}docs") \
+                  .replace('src="/', 'src="' + f"{basepath}docs")
 
   
   with open(dest_path, "w") as f:
