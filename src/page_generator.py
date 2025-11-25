@@ -61,7 +61,8 @@ def generate_page(from_path, template_path, dest_path):
   final_html = template_content.replace("{{ Title }}", title) \
                   .replace("{{ Content }}", html_content) \
                   .replace('href="/', 'href="' + root_folder + "/") \
-                  .replace('src="/', 'src="' + root_folder + "/static/")
+                  .replace('src="/', 'src="' + root_folder + "/static/") \
+                  .replace('href="static/', 'href="' + root_folder + "/static/")
   
   with open(dest_path, "w") as f:
     f.write(final_html)
