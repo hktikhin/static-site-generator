@@ -55,12 +55,13 @@ def generate_page(from_path, template_path, dest_path):
   html_content = html_node.to_html()
   title = extract_title(markdown_content)
   dest_dir = os.path.dirname(dest_path)
+  root_folder = os.path.basename(basepath) 
   if not os.path.exists(dest_dir):
     os.makedirs(dest_dir)
   final_html = template_content.replace("{{ Title }}", title) \
                   .replace("{{ Content }}", html_content) \
-                  .replace('href="/', 'href="' + f"{basepath}docs") \
-                  .replace('src="/', 'src="' + f"{basepath}docs")
+                  .replace('href="/', 'href="' + root_folder) \
+                  .replace('src="/', 'src="' + root_folder)
 
   
   with open(dest_path, "w") as f:
