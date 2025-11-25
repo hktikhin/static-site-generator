@@ -71,7 +71,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
 
   for entry in entries:
     source_path = os.path.join(dir_path_content, entry)
-    dest_path = os.path.join(dest_dir_path, entry)
+    name_without_ext, _ = os.path.splitext(entry)
+    dest_filename = name_without_ext + ".html"  
+    dest_path = os.path.join(dest_dir_path, dest_filename)
     if os.path.isfile(source_path):
       generate_page(source_path, template_path, dest_path)  
     else:
