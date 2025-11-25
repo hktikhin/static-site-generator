@@ -8,7 +8,7 @@
   </head>
 
   <body>
-    <article><div><h1>Tolkien Fan Club</h1><p><img src="docs/images/tolkien.png" alt="JRR Tolkien sitting"/></p><p>Here's the deal, <b>I like Tolkien</b>.</p><q>"I am in fact a Hobbit in all but size."
+    <article><div><h1>Tolkien Fan Club</h1><p><img src="/static-site-generator/images/tolkien.png" alt="JRR Tolkien sitting"/></p><p>Here's the deal, <b>I like Tolkien</b>.</p><q>"I am in fact a Hobbit in all but size."
 
 -- J.R.R. Tolkien</q><h2>Blog posts</h2><ul><li><a>Why Glorfindel is More Impressive than Legolas</a></li><li><a>Why Tom Bombadil Was a Mistake</a></li><li><a>The Unparalleled Majesty of "The Lord of the Rings"</a></li></ul><h2>Reasons I like Tolkien</h2><ul><li>You can spend years studying the legendarium and still not understand its depths</li><li>It can be enjoyed by children and adults alike</li><li>Disney <i>didn't ruin it</i> (okay, but Amazon might have)</li><li>It created an entirely new genre of fantasy</li></ul><h2>My favorite characters (in order)</h2><ol><li>Gandalf</li><li>Bilbo</li><li>Sam</li><li>Glorfindel</li><li>Galadriel</li><li>Elrond</li><li>Thorin</li><li>Sauron</li><li>Aragorn</li></ol><p>Here's what <code>elflang</code> looks like (the perfect coding language):</p><pre><code>func main(){
     fmt.Println("Aiya, Ambar!")
