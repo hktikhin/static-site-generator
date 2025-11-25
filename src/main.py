@@ -3,12 +3,12 @@ import os
 import shutil
 import sys
 
+if len(sys.argv) > 1:
+  basepath = sys.argv[1]
+else:
+  basepath = "/"
+
 def main():
-  if len(sys.argv) > 1:
-    basepath = sys.argv[1]
-  else:
-    basepath = "/"
-  
   if os.path.exists(f"{basepath}docs"):
     shutil.rmtree(f"{basepath}docs")
   copy_directory_recursive("static", f"{basepath}docs/static")
